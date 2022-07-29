@@ -1,0 +1,6 @@
+<h1>{{ item.category_name }}</h1>
+<ul>
+{% for it in item.choice_set.all %}
+    <li>{{ it.item_name }}</li>
+{% endfor %}
+</ul>

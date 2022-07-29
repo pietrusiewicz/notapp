@@ -1,0 +1,11 @@
+{% if latest_categories_list %}
+    <ul>
+    {% for c in latest_categories_list %}
+	<li>
+	    <a href="{{ c.id }}">{{ c.category_name }}</a>
+	</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No categories available.</p>
+{% endif %}
