@@ -1,16 +1,24 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.views.generic import TemplateView
 
 from .models import Category, Item
 
-def index(r):
-    latest_categories_list = Category.objects.order_by('-last_usage')[:5]
-    context = {
-        'latest_categories_list': latest_categories_list,
-    }
-    return render(r, 'items/index.html', context)
+class index(TemplateView):
+    template_name = 'items/index.html'
+    #context_object_name = 'latest_categories_list'
 
+    def get_context_data(self):
+        return {'latest_categories_list': Category.objects.all()}
+
+"""
+class items(TemplateView):
+    template_name = 'items/items.html'
+
+    def get_context_data(self):
+        return get_object_or_404(Category)
+"""
 def items(r, category_id):
     cat = get_object_or_404(Category, pk=category_id)
     return render(r, 'items/items.html', {'category':cat})
