@@ -1,0 +1,13 @@
+<h1>{{ category.category_name }}</h1>
+
+<ul>
+{% for item in category.item_set.all %}
+    <li>
+	    {{ item.item_name }} -- {{ item.price }} order{{ item.price|pluralize }}
+    </li>
+{% endfor %}
+</ul>
+
+<a href="{% url 'items:items' category.id %}">
+    Order again?
+</a>
