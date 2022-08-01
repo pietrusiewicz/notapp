@@ -12,16 +12,18 @@ class index(TemplateView):
     def get_context_data(self):
         return {'latest_categories_list': Category.objects.all()}
 
-"""
 class items(TemplateView):
     template_name = 'items/items.html'
 
-    def get_context_data(self):
-        return get_object_or_404(Category)
+    def get_context_data(self, **kwargs):
+        cid = self.kwargs['category_id']
+        cat = get_object_or_404(Category, pk=cid)
+        return {'category': cat}
 """
 def items(r, category_id):
     cat = get_object_or_404(Category, pk=category_id)
     return render(r, 'items/items.html', {'category':cat})
+"""
 
 def results(r, category_id):
     category = get_object_or_404(Category, pk=category_id)
