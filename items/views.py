@@ -19,15 +19,19 @@ class items(TemplateView):
         cid = self.kwargs['category_id']
         cat = get_object_or_404(Category, pk=cid)
         return {'category': cat}
-
+"""
 def results(r, category_id):
+    category = get_object_or_404(Category, pk=category_id)
+    return render(r, 'items/results.html', {'category': category})
+"""
+
+class results(TemplateView):
     template_name = 'items/results.html'
 
     def get_context_data(self, **kwargs):
         cid = self.kwargs['category_id']
         cat = get_object_or_404(Category, pk=cid)
         return {'category': cat}
-    
 
 def order(r, category_id):
     category = get_object_or_404(Category, pk=category_id)
