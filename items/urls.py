@@ -9,4 +9,6 @@ urlpatterns = [
     path('<int:category_id>/', views.items.as_view(), name='items'),
     path('<int:category_id>/results/', views.results.as_view(), name='results'),
     path('<int:category_id>/order/', views.order, name='order'),
+    path('login/', views.login.as_view(), name='login'),
+    path('auth/', views.auth, name='auth'),
 ]

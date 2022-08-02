@@ -1,0 +1,26 @@
+<style>
+input {
+  background: #066;
+}
+</style>
+<form action="{% url 'items:auth' %}" method="POST">
+    {% csrf_token %}
+    <fieldset>
+        <legend>
+        <h1>
+		login: <input type="text" name="usname" id="usname">
+        </h1>
+        <h3>
+		password: <input type="password" name="passwd" id="passwd">
+        </h3>
+        </legend>
+    </fieldset>
+    <input type="submit" value="Log in">
+</form>
+{% if error_message %}
+<p>
+    <strong>
+	    {{ error_message }}
+    </strong>
+</p>
+{% endif %}

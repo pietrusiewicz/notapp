@@ -2,8 +2,11 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.generic import TemplateView
+from django import forms
 
 from .models import Category, Item
+
+user = ''
 
 class index(TemplateView):
     template_name = 'items/index.html'
@@ -19,11 +22,6 @@ class items(TemplateView):
         cid = self.kwargs['category_id']
         cat = get_object_or_404(Category, pk=cid)
         return {'category': cat}
-"""
-def results(r, category_id):
-    category = get_object_or_404(Category, pk=category_id)
-    return render(r, 'items/results.html', {'category': category})
-"""
 
 class results(TemplateView):
     template_name = 'items/results.html'
@@ -32,6 +30,22 @@ class results(TemplateView):
         cid = self.kwargs['category_id']
         cat = get_object_or_404(Category, pk=cid)
         return {'category': cat}
+
+class login(TemplateView):
+    template_name = 'items/login.html'
+
+def auth(r):
+    from django.contrib.auth import authenticate
+    #print(r.POST)
+    usname, passwd = r.POST['usname'],r.POST['passwd']
+    user = authenticate(username=usname, password=passwd)
+    #print(user)
+    # correct password
+    if user:
+        return ""
+    # wrong password
+    else:
+        return HttpResponseRedirect(reverse('items:login', kwargs={"error_message":"Wrong Password"}))
 
 def order(r, category_id):
     category = get_object_or_404(Category, pk=category_id)
