@@ -2,6 +2,8 @@ import datetime
 
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
+
 
 class Category(models.Model):
     category_name = models.CharField(max_length=200)
@@ -20,3 +22,10 @@ class Item(models.Model):
 
     def __str__(self):
         return self.item_name
+
+class Order(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    purchase_date = models.DateTimeField('purchase date')
+
+    #def __str__(self):
+        #return self.objects.get(user)

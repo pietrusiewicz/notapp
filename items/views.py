@@ -6,7 +6,7 @@ from django import forms
 
 from .models import Category, Item
 
-user = ''
+#user = ''
 
 class index(TemplateView):
     template_name = 'items/index.html'
@@ -45,7 +45,6 @@ def auth(r):
         return ""
     # wrong password
     else:
-        #return HttpResponseRedirect(reverse('items:login', kwargs={"error_message":"Wrong Password"}))
         return render(r, 'items/login.html', {"error_message": "Wrong Password"})
 
 def order(r, category_id):
