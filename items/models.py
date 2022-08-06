@@ -27,5 +27,5 @@ class Order(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     purchase_date = models.DateTimeField('purchase date')
 
-    #def __str__(self):
-        #return self.objects.get(user)
+    def __str__(self):
+        return f"{self.id} - {self.user}"
