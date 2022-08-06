@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.views.generic import TemplateView
 from django import forms
 
-from .models import Category, Item
+from .models import Category, Item, Order
 
 #user = ''
 
@@ -42,6 +42,7 @@ def auth(r):
     #print(user)
     # correct password
     if user:
+        #TODO
         return ""
     # wrong password
     else:

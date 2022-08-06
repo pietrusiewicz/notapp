@@ -25,6 +25,7 @@ class Item(models.Model):
 
 class Order(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    item_name = models.ForeignKey(Item, on_delete=models.CASCADE)
     purchase_date = models.DateTimeField('purchase date')
 
     def __str__(self):
