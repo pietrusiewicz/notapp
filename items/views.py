@@ -64,22 +64,23 @@ def auth(r):
         #TODO
         #user_obj = User.query.filter_by(username=user)
         r.session['usname'] = str(user)
-        #print(r.session.get('usname'))
-        print(r.session.__dir__())
-        print(r.session.keys())
-        print(r.session.values())
-        print(r.session.items())
-        #r.session.save()
-        """
-        response = HttpResponse(status=302)
-        response['Location'] = '/sklapp/profile/'
-        return response
-        """
         return HttpResponseRedirect('/sklapp/profile/')
-        #return HttpResponseRedirect(reverse('items:profile', args=(user,)))
     # wrong password
     else:
         return render(r, 'items/login.html', {"error_message": "Wrong Password"})
+
+class register(TemplateView):
+    template_name = 'items/register.html'
+
+def create_user(r):
+    from django.contrib.auth.models import User
+    username, email, password = r.POST['register']
+    if username in User.objects.all():
+        return render(r, 'items/register.html', {"error_message": "User exists"})
+    # created user
+    else:
+        user = User.objects.create_user(username, email, password)
+        user.save()
 
 def order(r, category_id):
     category = get_object_or_404(Category, pk=category_id)

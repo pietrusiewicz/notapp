@@ -1,0 +1,29 @@
+<style>
+input {
+  background: #066;
+}
+</style>
+<form action="{% url 'items:create_user' %}" method="POST">
+    {% csrf_token %}
+    <fieldset>
+        <legend>
+        <h1>
+		login: <input type="text" name="usname" id="usname">
+        </h1>
+        <h2>
+		password: <input type="password" name="passwd" id="passwd">
+        </h2>
+        <h3>
+		email: <input type="email" name="email" id="email">
+        </h3>
+        </legend>
+    </fieldset>
+    <input type="submit" value="Register">
+</form>
+{% if error_message %}
+<p>
+    <strong>
+	    {{ error_message }}
+    </strong>
+</p>
+{% endif %}
