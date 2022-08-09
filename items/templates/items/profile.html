@@ -1,9 +1,17 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>user: {{usname}}</title>
+        <title>Your profile</title>
     </head>
     <body>
+	<header>
+	    <p>
+		user: {{usname}}
+		<button type="button">
+		    <a href="/sklapp/logout/">logout</a>
+		</button>
+	    </p>
+	</header>
 	{{orders}}
     </body>
 </html>
