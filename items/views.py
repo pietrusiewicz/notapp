@@ -3,6 +3,8 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.urls import reverse
 from django.views.generic import TemplateView
 from django import forms
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 
 from .models import Category, Item, Order
 
@@ -32,7 +34,6 @@ class results(TemplateView):
         return {'category': cat}
 
 def profile(r):
-    from django.contrib.auth.models import User
     if 'usname' in r.session.keys():
         user = User.objects.get(username=r.session['usname'])
         orders = Order.objects.get(pk=user.id) if Order.objects.count() > 0 else "We haven't orders"
@@ -42,26 +43,27 @@ def profile(r):
         }
         return render(r, 'items/profile.html', context)
 
-class login(TemplateView):
-    template_name = 'items/login.html'
-
-def auth(r):
-    from django.contrib.auth import authenticate
-    usname, passwd = r.POST['usname'],r.POST['passwd']
-    user = authenticate(username=usname, password=passwd)
-    # correct password
-    if user:
-        r.session['usname'] = str(user)
-        return HttpResponseRedirect('/sklapp/profile/')
-    # wrong password
+def login(r):
+    if 'usname' in r.POST and 'passwd' in r.POST:
+        usname, passwd = r.POST['usname'],r.POST['passwd']
+        user = authenticate(username=usname, password=passwd)
+        # correct password
+        if user:
+            r.session['usname'] = str(user)
+            return HttpResponseRedirect('/sklapp/profile/')
+        # wrong password
+        else:
+            #return render(r, 'items/login.html', {"error_message": "Wrong Password"})
+            context = {"error_message": "Wrong password"}
     else:
-        return render(r, 'items/login.html', {"error_message": "Wrong Password"})
+        context = {"error_message": "Fill empty brackets"}
+    return render(r, 'items/login.html', context)
+
 
 class register(TemplateView):
     template_name = 'items/register.html'
 
 def create_user(r):
-    from django.contrib.auth.models import User
     print(r.POST)
     username, email, password = [r.POST[s] for s in ['usname','passwd','email']]
     if username in User.objects.all():
@@ -72,6 +74,19 @@ def create_user(r):
         user.save()
         return HttpResponseRedirect('/sklapp/login/')
 
+def change_password(r):
+    usname = r.session['usname']
+    if 'passwd1' in list(r.POST.keys()):
+        if r.POST['passwd1'] == r.POST['passwd2']:
+            passwd = r.POST["passwd1"]
+            user = User(username=usname)
+            user.set_password(passwd)
+            return HttpResponseRedirect('/sklapp/profile/')
+        else:
+            return render(r, 'items/change_password.html', {"error_message": "passwords are not the same"})
+    else:
+        return render(r, 'items/change_password.html', {"error_message": "ford mondeo"})
+
 def logout(r):
     r.session['usname']=''
     return HttpResponseRedirect('/sklapp/login/')
@@ -79,7 +94,6 @@ def logout(r):
 def order(r, category_id):
     category = get_object_or_404(Category, pk=category_id)
     try:
-        print(r.POST)
         selected_items = r.POST['item']
     except (KeyError, Item):
         return render(r, 'items/items.html', {

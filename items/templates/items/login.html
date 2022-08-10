@@ -3,7 +3,7 @@ input {
   background: #066;
 }
 </style>
-<form action="{% url 'items:auth' %}" method="POST">
+<form action="{% url 'items:login' %}" method="POST">
     {% csrf_token %}
     <fieldset>
         <legend>

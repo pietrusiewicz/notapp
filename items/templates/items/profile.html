@@ -1,17 +1,19 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Your profile</title>
-    </head>
-    <body>
-	<header>
-	    <p>
-		user: {{usname}}
-		<button type="button">
-		    <a href="/sklapp/logout/">logout</a>
-		</button>
-	    </p>
-	</header>
-	{{orders}}
-    </body>
-</html>
+<head>
+    <title>Your profile</title>
+    <style>
+    </style>
+</head>
+<body>
+<header>
+    <p>
+	user: {{usname}}
+	<button type="button">
+	    <a href="/sklapp/change_password/">new password</a>
+	</button>
+	<button type="button">
+	    <a href="/sklapp/logout/">logout</a>
+	</button>
+    </p>
+</header>
+{{orders}}
+</body>
