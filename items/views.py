@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 
 from .models import Category, Item, Order
+from .forms import LoginForm, ChangePasswordForm
 
 #user = ''
 
@@ -33,6 +34,9 @@ class results(TemplateView):
         cat = get_object_or_404(Category, pk=cid)
         return {'category': cat}
 
+class register(TemplateView):
+    template_name = 'items/register.html'
+
 def profile(r):
     if 'usname' in r.session.keys():
         user = User.objects.get(username=r.session['usname'])
@@ -44,6 +48,8 @@ def profile(r):
         return render(r, 'items/profile.html', context)
 
 def login(r):
+    form = LoginForm()
+    context = {"forms":form}
     if 'usname' in r.POST and 'passwd' in r.POST:
         usname, passwd = r.POST['usname'],r.POST['passwd']
         user = authenticate(username=usname, password=passwd)
@@ -54,14 +60,11 @@ def login(r):
         # wrong password
         else:
             #return render(r, 'items/login.html', {"error_message": "Wrong Password"})
-            context = {"error_message": "Wrong password"}
+            #context = {"error_message": "Wrong password"}
+            context["error_message"] = "Wrong password"
     else:
-        context = {"error_message": "Fill empty brackets"}
+        context["error_message"] = "Fill empty brackets"
     return render(r, 'items/login.html', context)
-
-
-class register(TemplateView):
-    template_name = 'items/register.html'
 
 def create_user(r):
     print(r.POST)
@@ -75,6 +78,8 @@ def create_user(r):
         return HttpResponseRedirect('/sklapp/login/')
 
 def change_password(r):
+    form = ChangePasswordForm()
+    context = {"forms": form}
     usname = r.session['usname']
     if 'passwd1' in list(r.POST.keys()):
         if r.POST['passwd1'] == r.POST['passwd2']:
@@ -83,9 +88,11 @@ def change_password(r):
             user.set_password(passwd)
             return HttpResponseRedirect('/sklapp/profile/')
         else:
-            return render(r, 'items/change_password.html', {"error_message": "passwords are not the same"})
+            #return render(r, 'items/change_password.html', {"error_message": "passwords are not the same"})
+            context["error_message"]= "passwords are not the same"
     else:
-        return render(r, 'items/change_password.html', {"error_message": "ford mondeo"})
+        context["error_message"]= "ford mondeo"
+    return render(r, 'items/change_password.html', context)
 
 def logout(r):
     r.session['usname']=''

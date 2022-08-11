@@ -7,20 +7,13 @@ input {
     {% csrf_token %}
     <fieldset>
         <legend>
-        <h1>
-		login: <input type="text" name="usname" id="usname">
-        </h1>
-        <h3>
-		password: <input type="password" name="passwd" id="passwd">
-        </h3>
+	    {% for form in forms %}
+	    <h2>{{form.label}}: {{form}}</h2>
+	    {% endfor %}
         </legend>
     </fieldset>
     <input type="submit" value="Log in">
 </form>
 {% if error_message %}
-<p>
-    <strong>
-	    {{ error_message }}
-    </strong>
-</p>
+<p><strong>{{ error_message }}</strong></p>
 {% endif %}
