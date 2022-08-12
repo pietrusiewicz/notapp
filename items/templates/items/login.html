@@ -5,13 +5,7 @@ input {
 </style>
 <form action="{% url 'items:login' %}" method="POST">
     {% csrf_token %}
-    <fieldset>
-        <legend>
-	    {% for form in forms %}
-	    <h2>{{form.label}}: {{form}}</h2>
-	    {% endfor %}
-        </legend>
-    </fieldset>
+    {% include 'items/form.html' %}
     <input type="submit" value="Log in">
 </form>
 {% if error_message %}

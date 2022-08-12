@@ -3,10 +3,17 @@ input {
   background: #066;
 }
 </style>
-<form action="{% url 'items:create_user' %}" method="POST">
+<form action="{% url 'items:register' %}" method="POST">
     {% csrf_token %}
+    {% include 'items/form.html' %}
+		<!--
     <fieldset>
         <legend>
+	    {% for form in forms %}
+            <h2>
+		<label>{{form.label}}: {{form}}</label>
+	    </h2>
+	    {% endfor %}
         <h1>
 	    login: <input type="text" name="usname" id="usname">
         </h1>
@@ -18,6 +25,7 @@ input {
         </h3>
         </legend>
     </fieldset>
+		-->
     <input type="submit" value="Register">
 </form>
 {% if error_message %}

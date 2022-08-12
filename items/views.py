@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 
 from .models import Category, Item, Order
-from .forms import LoginForm, ChangePasswordForm
+from .forms import LoginForm, ChangePasswordForm, CreateUserForm
 
 #user = ''
 
@@ -34,8 +34,10 @@ class results(TemplateView):
         cat = get_object_or_404(Category, pk=cid)
         return {'category': cat}
 
+"""
 class register(TemplateView):
     template_name = 'items/register.html'
+"""
 
 def profile(r):
     if 'usname' in r.session.keys():
@@ -66,16 +68,21 @@ def login(r):
         context["error_message"] = "Fill empty brackets"
     return render(r, 'items/login.html', context)
 
-def create_user(r):
-    print(r.POST)
-    username, email, password = [r.POST[s] for s in ['usname','passwd','email']]
-    if username in User.objects.all():
-        return render(r, 'items/register.html', {"error_message": "User exists"})
+def register(r):
+    form = CreateUserForm()
+    context= {"forms": form}
     # create an user
-    else:
-        user = User.objects.create_user(username, email, password)
-        user.save()
-        return HttpResponseRedirect('/sklapp/login/')
+    if len(r.POST.keys()) == 4:
+        username, email, passwd1, passwd2 = [r.POST[s] for s in ['usname','email','passwd1','passwd2']]
+        if username in User.objects.all():
+            context["error_message"] = "User exists"
+        elif passwd1 == passwd2:
+            user = User.objects.create_user(username, email, password)
+            user.save()
+            return HttpResponseRedirect('/sklapp/login/')
+        else:
+            context["error_message"] = "passwords aren't the same"
+    return render(r, 'items/register.html', context)
 
 def change_password(r):
     form = ChangePasswordForm()
