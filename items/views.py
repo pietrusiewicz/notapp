@@ -34,11 +34,6 @@ class results(TemplateView):
         cat = get_object_or_404(Category, pk=cid)
         return {'category': cat}
 
-"""
-class register(TemplateView):
-    template_name = 'items/register.html'
-"""
-
 def profile(r):
     if 'usname' in r.session.keys():
         user = User.objects.get(username=r.session['usname'])
@@ -52,7 +47,8 @@ def profile(r):
 def login(r):
     form = LoginForm()
     context = {"forms":form}
-    if 'usname' in r.POST and 'passwd' in r.POST:
+    #if 'usname' in r.POST and 'passwd' in r.POST:
+    if len(r.POST) == 2:
         usname, passwd = r.POST['usname'],r.POST['passwd']
         user = authenticate(username=usname, password=passwd)
         # correct password
@@ -72,7 +68,8 @@ def register(r):
     form = CreateUserForm()
     context= {"forms": form}
     # create an user
-    if len(r.POST.keys()) == 4:
+    #if len(r.POST.keys()) == 4:
+    if len(r.POST) == 4:
         username, email, passwd1, passwd2 = [r.POST[s] for s in ['usname','email','passwd1','passwd2']]
         if username in User.objects.all():
             context["error_message"] = "User exists"
@@ -88,7 +85,8 @@ def change_password(r):
     form = ChangePasswordForm()
     context = {"forms": form}
     usname = r.session['usname']
-    if 'passwd1' in list(r.POST.keys()):
+    #if len(r.POST.keys()) == 2:
+    if len(r.POST) == 2:
         if r.POST['passwd1'] == r.POST['passwd2']:
             passwd = r.POST["passwd1"]
             user = User(username=usname)
@@ -98,7 +96,7 @@ def change_password(r):
             #return render(r, 'items/change_password.html', {"error_message": "passwords are not the same"})
             context["error_message"]= "passwords are not the same"
     else:
-        context["error_message"]= "ford mondeo"
+        context["error_message"]= "Fill missing fields"
     return render(r, 'items/change_password.html', context)
 
 def logout(r):
