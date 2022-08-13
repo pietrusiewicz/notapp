@@ -1,19 +1,11 @@
 <head>
     <title>Your profile</title>
     <style>
+	body {text-align:center;}
     </style>
 </head>
 <body>
-<header>
-    <p>
-	user: {{usname}}
-	<button type="button">
-	    <a href="/sklapp/change_password/">new password</a>
-	</button>
-	<button type="button">
-	    <a href="/sklapp/logout/">logout</a>
-	</button>
-    </p>
-</header>
+	{% include 'items/profile_bar.html' %}
+
 {{orders}}
 </body>

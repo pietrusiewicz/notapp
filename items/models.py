@@ -17,6 +17,7 @@ class Category(models.Model):
 
 class Item(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    owner = models.OneToOneField(User, on_delete=models.CASCADE)
     item_name = models.CharField(max_length=200)
     price = models.FloatField()
 

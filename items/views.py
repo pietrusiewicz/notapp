@@ -36,6 +36,7 @@ class results(TemplateView):
 
 def profile(r):
     if 'usname' in r.session.keys():
+    #except (KeyError):
         user = User.objects.get(username=r.session['usname'])
         orders = Order.objects.get(pk=user.id) if Order.objects.count() > 0 else "We haven't orders"
         context = {
@@ -44,11 +45,17 @@ def profile(r):
         }
         return render(r, 'items/profile.html', context)
 
+"""
+def add_item(r):
+    if r.session['usname']:
+        pass
+"""
+
 def login(r):
     form = LoginForm()
     context = {"forms":form}
-    #if 'usname' in r.POST and 'passwd' in r.POST:
-    if len(r.POST) == 2:
+    if 'usname' in r.POST and 'passwd' in r.POST:
+    #if len(list(r.POST)) == 2:
         usname, passwd = r.POST['usname'],r.POST['passwd']
         user = authenticate(username=usname, password=passwd)
         # correct password
@@ -85,8 +92,8 @@ def change_password(r):
     form = ChangePasswordForm()
     context = {"forms": form}
     usname = r.session['usname']
-    #if len(r.POST.keys()) == 2:
-    if len(r.POST) == 2:
+    if len(r.POST.keys()) == 2:
+    #if len(r.POST) == 2:
         if r.POST['passwd1'] == r.POST['passwd2']:
             passwd = r.POST["passwd1"]
             user = User(username=usname)
