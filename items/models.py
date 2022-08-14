@@ -17,7 +17,8 @@ class Category(models.Model):
 
 class Item(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    owner = models.OneToOneField(User, on_delete=models.CASCADE)
+    #owner = models.OneToOneField(User, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     item_name = models.CharField(max_length=200)
     price = models.FloatField()
 
@@ -25,7 +26,8 @@ class Item(models.Model):
         return self.item_name
 
 class Order(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    #user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     item_name = models.ForeignKey(Item, on_delete=models.CASCADE)
     purchase_date = models.DateTimeField('purchase date')
 

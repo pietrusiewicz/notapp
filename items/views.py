@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 
 from .models import Category, Item, Order
-from .forms import LoginForm, ChangePasswordForm, CreateUserForm
+from .forms import LoginForm, ChangePasswordForm, CreateUserForm, AddItemForm
 
 #user = ''
 
@@ -44,12 +44,24 @@ def profile(r):
                 'orders': orders
         }
         return render(r, 'items/profile.html', context)
+    else:
+        return HttpResponseRedirect('/sklapp/login/')
 
-"""
 def add_item(r):
     if r.session['usname']:
-        pass
-"""
+        user = User.objects.get(username=r.session['usname'])
+        if 'itemname' in r.POST and 'categoryid' in r.POST and 'price' in r.POST:
+            category, itemname, price = r.POST['categoryid'], r.POST['itemname'], r.POST['price']
+            c = Category.objects.get(id=category)
+            c.item_set.create(owner=user, item_name=itemname,price=price)
+            c.save()
+            return HttpResponseRedirect('/sklapp/profile/')
+        else:
+            form = AddItemForm()
+            context={'forms':form, 'categories':Category.objects.all()}
+            return render(r, 'items/add_item.html', context)
+    else:
+        return HttpResponseRedirect('/sklapp/login/')
 
 def login(r):
     form = LoginForm()
@@ -116,6 +128,7 @@ def order(r, category_id):
         selected_items = r.POST['item']
     except (KeyError, Item):
         return render(r, 'items/items.html', {
+            'usname': r.session['usname'],
             'category': category,
             'error_message': "You picked nothing",
         })
