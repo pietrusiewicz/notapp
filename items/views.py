@@ -38,10 +38,17 @@ def profile(r):
     if 'usname' in r.session.keys():
     #except (KeyError):
         user = User.objects.get(username=r.session['usname'])
-        orders = Order.objects.get(pk=user.id) if Order.objects.count() > 0 else "We haven't orders"
+        orders = Order.objects.filter(pk=user.id)
+        items = Item.objects.filter(owner=user)
+        if not len(orders):
+            orders = ""
+        if not len(items):
+            items = ""
+
         context = {
                 'usname': user.username, 
-                'orders': orders
+                'orders': orders,
+                'items': items
         }
         return render(r, 'items/profile.html', context)
     else:

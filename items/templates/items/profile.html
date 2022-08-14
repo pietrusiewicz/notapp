@@ -1,11 +1,26 @@
 <head>
     <title>Your profile</title>
     <style>
-	body {text-align:center;}
+	header {text-align:center;}
     </style>
 </head>
 <body>
-	{% include 'items/profile_bar.html' %}
-
+    {% include 'items/profile_bar.html' %}
+    <div style="float:left; width:50%">
+	<h2>items:</h2>
+	<ol>
+	    {% for item in items %}
+	    <li>{{item.item_name}}</li>
+	    {% endfor %}
+	</ol>
+    </div>
+    <div style="float:left; width:50%">
+	<h2>orders:</h2>
+	<ol>
+	    {% for order in orders %}
+	    <li>{{order}}</li>
+	    {% endfor %}
+	</ol>
+    </div>
 {{orders}}
 </body>
