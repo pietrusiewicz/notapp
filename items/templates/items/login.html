@@ -8,6 +8,7 @@ input {
     {% include 'items/form.html' %}
     <input type="submit" value="Log in">
 </form>
+<p>Haven't you account? <a href="{% url 'items:register' %}">Register today</a></p>
 {% if error_message %}
 <p><strong>{{ error_message }}</strong></p>
 {% endif %}

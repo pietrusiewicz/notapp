@@ -34,6 +34,13 @@ class results(TemplateView):
         cat = get_object_or_404(Category, pk=cid)
         return {'category': cat}
 
+def add_to_cart(r):
+    categoryid, item = r.POST['categoryid'], r.POST['item']
+    if "cart" in r.session:
+        r.session["cart"].append((categoryid, item))
+    else:
+        r.session["cart"] = [(categoryid, item)]
+
 def profile(r):
     if 'usname' in r.session.keys():
     #except (KeyError):
@@ -94,9 +101,10 @@ def register(r):
     form = CreateUserForm()
     context= {"forms": form}
     # create an user
-    #if len(r.POST.keys()) == 4:
-    if len(r.POST) == 4:
-        username, email, passwd1, passwd2 = [r.POST[s] for s in ['usname','email','passwd1','passwd2']]
+    fields = ['usname','email','passwd1','passwd2']
+    condition=[s in r.POST for s in fields]
+    if min(condition):
+        username, email, passwd1, passwd2 = [r.POST[s] for s in fields]
         if username in User.objects.all():
             context["error_message"] = "User exists"
         elif passwd1 == passwd2:
@@ -108,10 +116,11 @@ def register(r):
     return render(r, 'items/register.html', context)
 
 def change_password(r):
+    usname = r.session['usname']
     form = ChangePasswordForm()
     context = {"forms": form}
-    usname = r.session['usname']
-    if len(r.POST.keys()) == 2:
+    if 'passwd1' in r.POST and 'passwd2' in r.POST:
+    #if len(r.POST.keys()) == 2:
     #if len(r.POST) == 2:
         if r.POST['passwd1'] == r.POST['passwd2']:
             passwd = r.POST["passwd1"]

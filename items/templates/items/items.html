@@ -1,3 +1,4 @@
+{% include 'items/profile_bar.html' %}
 <form action="{% url 'items:order' category.id %}" method="POST">
 	{% csrf_token %}
 	<fieldset>
