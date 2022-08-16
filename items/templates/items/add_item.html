@@ -1,0 +1,23 @@
+<style>
+input {
+  background: #066;
+}
+</style>
+<form action="{% url 'items:add_item' %}" method="POST">
+    {% csrf_token %}
+    <ol>
+    {% for category in categories %}
+    <li> 
+	    <label>{{category.category_name}}: 
+    <input type="radio", value="{{category.id}}" name="categoryid" id="categoryid">
+	    </label>
+    </li>
+    {% endfor %}
+    </ol>
+    {% include 'items/form.html' %}
+    <input type="submit" value="create item">
+</form>
+{% if error_message %}
+<p><strong>{{ error_message }}</strong></p>
+{% endif %}
+

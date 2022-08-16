@@ -1,0 +1,33 @@
+<style>
+input {background: #066;}
+</style>
+<script>
+function f(){
+	var elem = document.getElementById('place_for_cart');
+	var text = `{% include 'items/cart.html'%}`;
+	text = text.split(/\r?\n/).join(' ');
+	elem.innerHTML = text;
+}
+
+
+</script>
+<header>
+<p>
+    <a href="/sklapp/profile/">profile: </a>
+    <a href="/sklapp/change_password/">
+	<input type="button" value="new password">
+    </a>
+
+    <a href="/sklapp/add_item/">
+	<input type="button" value="add item">
+    </a>
+    <input type="button" value="cart" onclick="f()"/>
+    <div id="place_for_cart">
+    </div>
+    <a href="/sklapp/logout/">
+	<input type="button" value="logout">
+	
+    </a>
+    
+</p>
+</header>

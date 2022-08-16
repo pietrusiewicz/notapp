@@ -1,0 +1,10 @@
+<fieldset>
+    <legend>
+	{% for form in forms %}
+	<h2>
+	<label>{{form.label}}: {{form}}</label>
+	</h2>
+	{% endfor %}
+    </legend>
+</fieldset>
+
