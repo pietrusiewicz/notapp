@@ -11,9 +11,9 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('login/', views.login, name='login'),
     path('change_password/', views.change_password, name='change_password'),
-    #path('create_user/', views.create_user, name='create_user'),
+    path('add_to_cart/<int:categoryid>/<int:itemid>', views.add_to_cart, name='add_to_cart'),
     path('logout/', views.logout, name='logout'),
     path('profile/', views.profile, name='profile'),
-    path('<int:category_id>/order/', views.order, name='order'),
+    path('checkout/', views.checkout, name='checkout'),
     path('add_item/', views.add_item, name="add_item")
 ]

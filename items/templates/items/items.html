@@ -1,25 +1,29 @@
 {% include 'items/profile_bar.html' %}
-<form action="{% url 'items:order' category.id %}" method="POST">
+<form action="{% url 'items:checkout' %}" method="POST">
 	{% csrf_token %}
 	<fieldset>
 	    <legend>
 		<h1>{{ category.item_name }}</h1>
 	    </legend>
-	    {% if error_message %}
-		<p>
-		    <strong>
-			    {{ error_message }}
-		    </strong>
-		</p>
-	    {% endif %}
 	    {% for item in category.item_set.all %}
+	    <!--
 		<input type="checkbox" name="item" id="item{{forloop.counter}}" value="{{ item.id }}">
 		<label for="item{{forloop.counter}}">
 		    {{ item.item_name }}
 		</label>
-		<p>{{ item.price }}</p>
+	    -->
+	    <p>{{ item.item_name }} ({{ item.price }})
+	    <a href="/sklapp/add_to_cart/{{category.id}}/{{item.id}}">add to cart</a>
+	    </p>
 		<br/>
 	    {% endfor %}
 	</fieldset>
 	<input type="submit" value="order">
 </form>
+{% if error_message %}
+<p>
+    <strong>
+	    {{ error_message }}
+    </strong>
+</p>
+{% endif %}

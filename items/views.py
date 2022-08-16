@@ -5,6 +5,7 @@ from django.views.generic import TemplateView
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from django.utils import timezone
 
 from .models import Category, Item, Order
 from .forms import LoginForm, ChangePasswordForm, CreateUserForm, AddItemForm
@@ -34,12 +35,14 @@ class results(TemplateView):
         cat = get_object_or_404(Category, pk=cid)
         return {'category': cat}
 
-def add_to_cart(r):
-    categoryid, item = r.POST['categoryid'], r.POST['item']
+def add_to_cart(r, categoryid, itemid):
+    #categoryid, item = r.POST['categoryid'], r.POST['item']
     if "cart" in r.session:
-        r.session["cart"].append((categoryid, item))
+        r.session["cart"].append((categoryid, itemid))
     else:
-        r.session["cart"] = [(categoryid, item)]
+        r.session["cart"] = [(categoryid, itemid)]
+
+    return HttpResponseRedirect('/sklapp/profile')
 
 def profile(r):
     if 'usname' in r.session.keys():
@@ -138,10 +141,10 @@ def logout(r):
     r.session['usname']=''
     return HttpResponseRedirect('/sklapp/login/')
 
-def order(r, category_id):
-    category = get_object_or_404(Category, pk=category_id)
+def checkout(r):
+    #category = get_object_or_404(Category, pk=category_id)
     try:
-        selected_items = r.POST['item']
+        selected_items = r.session['cart']
     except (KeyError, Item):
         return render(r, 'items/items.html', {
             'usname': r.session['usname'],
@@ -149,8 +152,12 @@ def order(r, category_id):
             'error_message': "You picked nothing",
         })
     else:
-        for item in category.item_set.all():
-            if str(item.pk) in selected_items:
-                item.price += 0.01
-                item.save()
+        u = User.objects.get(username=r.session['usname'])
+        #for item in category.item_set.all():
+        for category_id, item_id in selected_items:
+            c = Category.objects.get(id=category_id)
+            item = c.item_set.get(id=item_id)
+            item.price += 0.01
+            item.save()
+            Order.objects.create(user=u, item_name=item, purchase_date=timezone.now())
         return HttpResponseRedirect(reverse('items:results', args=(category_id,)))
