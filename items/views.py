@@ -136,7 +136,7 @@ def register(r):
         if username in User.objects.all():
             context["error_message"] = "User exists"
         elif passwd1 == passwd2:
-            user = User.objects.create_user(username, email, password)
+            user = User.objects.create_user(username, email, passwd1)
             user.save()
             return HttpResponseRedirect('/sklapp/login/')
         else:
@@ -168,8 +168,9 @@ def logout(r):
 
 def checkout(r):
     #category = get_object_or_404(Category, pk=category_id)
+    user = User.objects.get(username=r.session['usname'])
     try:
-        selected_items = r.session['cart']
+        cart_items = Cart.objects.filter(user=user)#r.session['cart']
     except (KeyError, Item):
         return render(r, 'items/items.html', {
             'usname': r.session['usname'],
@@ -177,12 +178,12 @@ def checkout(r):
             'error_message': "You picked nothing",
         })
     else:
-        u = User.objects.get(username=r.session['usname'])
+        #u = User.objects.get(username=r.session['usname'])
         #for item in category.item_set.all():
-        for category_id, item_id in selected_items:
-            c = Category.objects.get(id=category_id)
-            item = c.item_set.get(id=item_id)
+        for cart_item in cart_items:
+            c = Category.objects.get(id=cart_item.categoryid)
+            item = c.item_set.get(id=cart_item.itemid)
             item.price += 0.01
             item.save()
-            Order.objects.create(user=u, item_name=item, purchase_date=timezone.now())
-        return HttpResponseRedirect(reverse('items:results', args=(category_id,)))
+            Order.objects.create(user=user, item_name=item, purchase_date=timezone.now())
+        return HttpResponseRedirect(reverse('items:profile'))
