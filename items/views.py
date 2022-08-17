@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.utils import timezone
 
-from .models import Category, Item, Order
+from .models import Category, Item, Order, Cart
 from .forms import LoginForm, ChangePasswordForm, CreateUserForm, AddItemForm
 
 #user = ''
@@ -36,29 +36,54 @@ class results(TemplateView):
         return {'category': cat}
 
 def add_to_cart(r, categoryid, itemid):
-    #categoryid, item = r.POST['categoryid'], r.POST['item']
-    if "cart" in r.session:
-        r.session["cart"].append((categoryid, itemid))
-    else:
-        r.session["cart"] = [(categoryid, itemid)]
+    user = User.objects.get(username=r.session['usname'])
+    c = Cart.objects.create(user=user, categoryid=categoryid, itemid=itemid, adding_date=timezone.now())
+    c.save()
 
     return HttpResponseRedirect('/sklapp/profile')
 
+def del_from_cart(r, position):
+    user = User.objects.get(username=r.session['usname'])
+    c = Cart.objects.filter(user=user)
+    c = c.order_by('adding_date')
+    for i, line in enumerate(c):
+        if i+1 == position:
+            line.delete()
+
+    return HttpResponseRedirect('/sklapp/profile/')
+
+def clear_the_cart(r):
+    user = User.objects.get(username=r.session['usname'])
+    c = Cart.objects.filter(user=user)
+    c.delete()
+    return HttpResponseRedirect('/sklapp/profile/')
+
 def profile(r):
+    def get_cart_items(cart_items):
+        citems = []
+        for cart_item in cart_items:
+            cat = Category.objects.get(pk=cart_item.categoryid)
+            item = cat.item_set.get(pk=cart_item.itemid)
+            citems.append(item)
+        return citems
+
     if 'usname' in r.session.keys():
     #except (KeyError):
         user = User.objects.get(username=r.session['usname'])
         orders = Order.objects.filter(pk=user.id)
         items = Item.objects.filter(owner=user)
+        cart_items = Cart.objects.filter(user=user)
         if not len(orders):
             orders = ""
         if not len(items):
             items = ""
 
+
         context = {
                 'usname': user.username, 
                 'orders': orders,
-                'items': items
+                'items': items, #items,
+                'cart_items': get_cart_items(cart_items)
         }
         return render(r, 'items/profile.html', context)
     else:

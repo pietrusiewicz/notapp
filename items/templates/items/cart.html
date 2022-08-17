@@ -1,4 +1,11 @@
-{% for item in items %}
-{{item}};
+{% for item in cart_items %}
+    {{ item.item_name }} - {{ item.price }}
+    <a href="/sklapp/del_from_cart/{{forloop.counter}}/">
+	<input type="button" value="-"/>
+    </a>
+    <br/>
 {% endfor %}
 <input type="button" value="hide" onclick="document.getElementById('place_for_cart').innerHTML = ''"/>
+<a href="/sklapp/clear_the_cart/">
+<input type="button" value="clear the cart"/>
+</a>

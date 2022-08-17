@@ -33,3 +33,13 @@ class Order(models.Model):
 
     def __str__(self):
         return f"{self.id} - {self.user}"
+
+class Cart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    categoryid = models.IntegerField()
+    itemid = models.IntegerField()
+    adding_date = models.DateTimeField('add date')
+
+    def get_item(self):
+        c = Category.objects.get(pk=self.categoryid)
+        return c.item_set.get(pk=self.itemid)
