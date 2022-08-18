@@ -35,12 +35,35 @@ class results(TemplateView):
         cat = get_object_or_404(Category, pk=cid)
         return {'category': cat}
 
+def get_cart_context(username):
+    user = User.objects.get(username=username)
+    orders = Order.objects.filter(user=user)
+    items = Item.objects.filter(owner=user)
+    citems = Cart.objects.filter(user=user)
+    if not len(orders):
+        orders = ""
+    if not len(items):
+        items = ""
+    cart_items = []
+    for cart_item in citems:
+        cat = Category.objects.get(pk=cart_item.categoryid)
+        item = cat.item_set.get(pk=cart_item.itemid)
+        cart_items.append(item)
+
+    context = {
+            'usname': user.username, 
+            'orders': orders,
+            'items': items,
+            'cart_items': cart_items
+    }
+    return context
+
 def add_to_cart(r, categoryid, itemid):
     user = User.objects.get(username=r.session['usname'])
     c = Cart.objects.create(user=user, categoryid=categoryid, itemid=itemid, adding_date=timezone.now())
     c.save()
 
-    return HttpResponseRedirect('/sklapp/profile')
+    return HttpResponseRedirect(f'/sklapp/{categoryid}')
 
 def del_from_cart(r, position):
     user = User.objects.get(username=r.session['usname'])
@@ -59,32 +82,9 @@ def clear_the_cart(r):
     return HttpResponseRedirect('/sklapp/profile/')
 
 def profile(r):
-    def get_cart_items(cart_items):
-        citems = []
-        for cart_item in cart_items:
-            cat = Category.objects.get(pk=cart_item.categoryid)
-            item = cat.item_set.get(pk=cart_item.itemid)
-            citems.append(item)
-        return citems
-
     if 'usname' in r.session.keys():
-    #except (KeyError):
-        user = User.objects.get(username=r.session['usname'])
-        orders = Order.objects.filter(pk=user.id)
-        items = Item.objects.filter(owner=user)
-        cart_items = Cart.objects.filter(user=user)
-        if not len(orders):
-            orders = ""
-        if not len(items):
-            items = ""
-
-
-        context = {
-                'usname': user.username, 
-                'orders': orders,
-                'items': items, #items,
-                'cart_items': get_cart_items(cart_items)
-        }
+        context = get_cart_context(r.session["usname"])
+        #print(context)
         return render(r, 'items/profile.html', context)
     else:
         return HttpResponseRedirect('/sklapp/login/')
@@ -170,8 +170,9 @@ def checkout(r):
     #category = get_object_or_404(Category, pk=category_id)
     user = User.objects.get(username=r.session['usname'])
     try:
-        cart_items = Cart.objects.filter(user=user)#r.session['cart']
-    except (KeyError, Item):
+        cart_items = Cart.objects.filter(user=user)
+        print(cart_items)
+    except (KeyError, Cart):
         return render(r, 'items/items.html', {
             'usname': r.session['usname'],
             'category': category,
@@ -186,4 +187,6 @@ def checkout(r):
             item.price += 0.01
             item.save()
             Order.objects.create(user=user, item_name=item, purchase_date=timezone.now())
-        return HttpResponseRedirect(reverse('items:profile'))
+
+        return HttpResponseRedirect(reverse('items:clear_the_cart'))
+

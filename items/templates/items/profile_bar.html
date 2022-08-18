@@ -1,19 +1,12 @@
 <style>
 input {background: #066;}
+a {text-decoration: none;color:#660;}
+header {text-align:center;}
 </style>
-<script>
-function f(){
-	var elem = document.getElementById('place_for_cart');
-	var text = `{% include 'items/cart.html'%}`;
-	text = text.split(/\r?\n/).join(' ');
-	elem.innerHTML = text;
-}
-
-
-</script>
 <header>
+<a href="/sklapp/">Shop</a>
 <p>
-    <a href="/sklapp/profile/">profile: </a>
+<a href="/sklapp/profile/">{{usname}} </a>
     <a href="/sklapp/change_password/">
 	<input type="button" value="new password">
     </a>
@@ -21,11 +14,12 @@ function f(){
     <a href="/sklapp/add_item/">
 	<input type="button" value="add item">
     </a>
-
+<!--
     <a href="/sklapp/checkout/">
 	<input type="button" value="order">
     </a>
-    <input type="button" value="cart" onclick="f()"/>
+-->
+    <input type="button" value="cart" id="cart" onclick="f()"/>
     <a href="/sklapp/logout/">
 	<input type="button" value="logout">
 	
@@ -35,3 +29,20 @@ function f(){
     
 </p>
 </header>
+<script>
+function f(n=1) {
+    var elem = document.getElementById('place_for_cart');
+    if (n==1) {
+	var text = `{% include 'items/cart.html'%}`;
+	text = text.split(/\r?\n/).join(' ');
+	elem.innerHTML = text;
+	document.getElementById('cart').setAttribute('onclick', "f(0)");
+    } else {
+	elem.innerHTML = ''
+	document.getElementById('cart').setAttribute('onclick', "f()");
+
+    }
+}
+
+
+</script>
