@@ -31,17 +31,17 @@ header {text-align:center;}
 </header>
 <script>
 function f(n=1) {
+    var text = ""
     var elem = document.getElementById('place_for_cart');
     if (n==1) {
-	var text = `{% include 'items/cart.html'%}`;
+	text = `{% include 'items/cart.html'%}`;
 	text = text.split(/\r?\n/).join(' ');
-	elem.innerHTML = text;
 	document.getElementById('cart').setAttribute('onclick', "f(0)");
     } else {
-	elem.innerHTML = ''
 	document.getElementById('cart').setAttribute('onclick', "f()");
 
     }
+elem.innerHTML = text;
 }
 
 

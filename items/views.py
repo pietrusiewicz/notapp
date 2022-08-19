@@ -37,20 +37,29 @@ def get_cart_context(username):
 
 class index(TemplateView):
     template_name = 'items/index.html'
-    #context_object_name = 'latest_categories_list'
 
-    def get_context_data(self):
-        #print(super().__dir__())
-        #print(super().response_class.__dir__())
-        return {'latest_categories_list': Category.objects.all()}
+    def get_context_data(self, **kwargs):
+        if "usname" in self.request.session.keys():
+            user = self.request.session["usname"]
+            context = get_cart_context(user)
+            context['latest_categories_list'] = Category.objects.all()
+            return context
+        else:
+            return HttpResponseRedirect('/sklapp/login/')
+
 
 class items(TemplateView):
     template_name = 'items/items.html'
 
-    def get_context_data(self, **kwargs):
-        cid = self.kwargs['category_id']
-        cat = get_object_or_404(Category, pk=cid)
-        return {'category': cat}
+    def get_context_data(self, *args, **kwargs):
+        if "usname" in self.request.session.keys():
+            user = self.request.session["usname"]
+            context = get_cart_context(user)
+            print(kwargs)
+            cid = kwargs['category_id']
+            context['category'] = get_object_or_404(Category, pk=cid)
+            print(context)
+            return context
 
 class results(TemplateView):
     template_name = 'items/results.html'
@@ -68,14 +77,19 @@ def add_to_cart(r, categoryid, itemid):
     return HttpResponseRedirect(f'/sklapp/{categoryid}')
 
 def del_from_cart(r, position):
-    user = User.objects.get(username=r.session['usname'])
-    c = Cart.objects.filter(user=user)
-    c = c.order_by('adding_date')
-    for i, line in enumerate(c):
-        if i+1 == position:
-            line.delete()
+    if 'usname' in r.session:
+        user = User.objects.get(username=r.session['usname'])
+        c = Cart.objects.filter(user=user)
+        c = c.order_by('adding_date')
+        for i, line in enumerate(c):
+            if i+1 == position:
+                line.delete()
+        
+        current_site = r.path.split('/')[-1]
+        return HttpResponseRedirect(f'/sklapp/{current_site}')
+    else:
+        return HttpResponseRedirect('/sklapp/login/')
 
-    return HttpResponseRedirect('/sklapp/profile/')
 
 def clear_the_cart(r):
     user = User.objects.get(username=r.session['usname'])
@@ -83,12 +97,14 @@ def clear_the_cart(r):
     c.delete()
     return HttpResponseRedirect('/sklapp/profile/')
 
-class profile(base.View):
-    def get(self, r, *args, **kwargs):
-        if 'usname' in r.session.keys():
-            context = get_cart_context(r.session["usname"])
-            #print(context)
-            return render(r, 'items/profile.html', context)
+
+class profile(TemplateView):
+    template_name = 'items/profile.html'
+
+    def get_context_data(self, *args, **kwargs):
+        user = self.request.session["usname"]
+        if user:
+            return get_cart_context(user)
         else:
             return HttpResponseRedirect('/sklapp/login/')
 
@@ -100,6 +116,7 @@ def add_item(r):
             c = Category.objects.get(id=category)
             c.item_set.create(owner=user, item_name=itemname,price=price)
             c.save()
+            current_site = r.path.split('/')[-1]
             return HttpResponseRedirect('/sklapp/profile/')
         else:
             form = AddItemForm()
@@ -110,18 +127,12 @@ def add_item(r):
     else:
         return HttpResponseRedirect('/sklapp/login/')
 
-class login(base.View):
-    def get(self, r, *args, **kwargs):
-        if r.session['usname']:
-            return HttpResponseRedirect('/sklapp/profile/')
-        else:
-            form = LoginForm()
-            context = {"forms":form}
-            return render(r, 'items/login.html', context)
+class login(TemplateView):
+    template_name = 'items/login.html'
 
     def post(self, r, *args, **kwargs):
         form = LoginForm()
-        context = {"forms":form}
+        self.context = {"forms":form}
         if 'usname' in r.POST and 'passwd' in r.POST:
             usname, passwd = r.POST['usname'],r.POST['passwd']
             user = authenticate(username=usname, password=passwd)
@@ -132,16 +143,23 @@ class login(base.View):
 
             # wrong password
             else:
-                context["error_message"] = "Wrong password"
+                self.context["error_message"] = "Wrong password"
         else:
-            context["error_message"] = "Fill empty brackets"
-        return render(r, 'items/login.html', context)
+            self.context["error_message"] = "Fill empty brackets"
+        return render(r, template_name, context)
 
-class register(base.View):
-    def get(self, r, *args, **kwargs):
-        form = CreateUserForm()
-        context = {"forms": form}
-        return render(r, 'items/register.html', context)
+    def get_context_data(self, *args, **kwargs):
+        if "usname" in self.request.session:
+            user = self.request.session["usname"]
+            return HttpResponseRedirect('/sklapp/profile/')
+        else:
+            form = LoginForm()
+            context = {"forms":form}
+            return context
+
+class register(TemplateView):
+    template_name = 'items/register.html'
+
     def post(self, r, *args, **kwargs):
         form = CreateUserForm()
         context = {"forms": form}
@@ -150,6 +168,7 @@ class register(base.View):
         condition=[s in r.POST for s in fields]
         if min(condition):
             username, email, passwd1, passwd2 = [r.POST[s] for s in fields]
+            username = username.lower()
             if username in User.objects.all():
                 context["error_message"] = "User exists"
             # creating an user
@@ -159,28 +178,15 @@ class register(base.View):
                 return HttpResponseRedirect('/sklapp/login/')
             else:
                 context["error_message"] = "passwords aren't the same"
-        return render(r, 'items/register.html', context)
-
-"""
-def register(r):
-    form = CreateUserForm()
-    context= {"forms": form}
-    # create an user
-    fields = ['usname','email','passwd1','passwd2']
-    condition=[s in r.POST for s in fields]
-    if min(condition):
-        username, email, passwd1, passwd2 = [r.POST[s] for s in fields]
-        if username in User.objects.all():
-            context["error_message"] = "User exists"
-        elif passwd1 == passwd2:
-            user = User.objects.create_user(username, email, passwd1)
-            user.save()
-            return HttpResponseRedirect('/sklapp/login/')
         else:
-            context["error_message"] = "passwords aren't the same"
-    return render(r, 'items/register.html', context)
+            context["error_message"] = "fill empty brackets"
+        return render(r, template_name, context)
 
-"""
+    def get_context_data(self, *args, **kwargs):
+        form = CreateUserForm()
+        context = {"forms": form}
+        return context
+
 def change_password(r):
     usname = r.session['usname']
     form = ChangePasswordForm()
@@ -194,14 +200,16 @@ def change_password(r):
             user.set_password(passwd)
             return HttpResponseRedirect('/sklapp/profile/')
         else:
-            #return render(r, 'items/change_password.html', {"error_message": "passwords are not the same"})
             context["error_message"]= "passwords are not the same"
     else:
         context["error_message"]= "Fill missing fields"
     return render(r, 'items/change_password.html', context)
 
 def logout(r):
-    r.session['usname']=''
+    try:
+        del r.session['usname']
+    except KeyError:
+        pass
     return HttpResponseRedirect('/sklapp/login/')
 
 def checkout(r):
