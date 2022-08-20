@@ -69,33 +69,35 @@ class results(TemplateView):
         cat = get_object_or_404(Category, pk=cid)
         return {'category': cat}
 
-def add_to_cart(r, categoryid, itemid):
-    user = User.objects.get(username=r.session['usname'])
-    c = Cart.objects.create(user=user, categoryid=categoryid, itemid=itemid, adding_date=timezone.now())
-    c.save()
+class CartView:
+    "cart methods"
+    def add_to_cart(r, categoryid, itemid):
+        user = User.objects.get(username=r.session['usname'])
+        c = Cart.objects.create(user=user, categoryid=categoryid, itemid=itemid, adding_date=timezone.now())
+        c.save()
 
-    return HttpResponseRedirect(f'/sklapp/{categoryid}')
+        return HttpResponseRedirect(f'/sklapp/{categoryid}')
 
-def del_from_cart(r, position):
-    if 'usname' in r.session:
+    def del_from_cart(r, position):
+        if 'usname' in r.session:
+            user = User.objects.get(username=r.session['usname'])
+            c = Cart.objects.filter(user=user)
+            c = c.order_by('adding_date')
+            for i, line in enumerate(c):
+                if i+1 == position:
+                    line.delete()
+            
+            current_site = r.path.split('/')[-1]
+            return HttpResponseRedirect(f'/sklapp/{current_site}')
+        else:
+            return HttpResponseRedirect('/sklapp/login/')
+
+
+    def clear_the_cart(r):
         user = User.objects.get(username=r.session['usname'])
         c = Cart.objects.filter(user=user)
-        c = c.order_by('adding_date')
-        for i, line in enumerate(c):
-            if i+1 == position:
-                line.delete()
-        
-        current_site = r.path.split('/')[-1]
-        return HttpResponseRedirect(f'/sklapp/{current_site}')
-    else:
-        return HttpResponseRedirect('/sklapp/login/')
-
-
-def clear_the_cart(r):
-    user = User.objects.get(username=r.session['usname'])
-    c = Cart.objects.filter(user=user)
-    c.delete()
-    return HttpResponseRedirect('/sklapp/profile/')
+        c.delete()
+        return HttpResponseRedirect('/sklapp/profile/')
 
 
 class profile(TemplateView):

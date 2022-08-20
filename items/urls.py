@@ -13,9 +13,12 @@ urlpatterns = [
     #path('login/', views.login, name='login'),
     path('login/', views.login.as_view(), name='login'),
     path('change_password/', views.change_password, name='change_password'),
-    path('add_to_cart/<int:categoryid>/<int:itemid>', views.add_to_cart, name='add_to_cart'),
-    path('del_from_cart/<int:position>/', views.del_from_cart, name='del_from_cart'),
-    path('clear_the_cart/', views.clear_the_cart, name='clear_the_cart'),
+
+    # cart
+    path('add_to_cart/<int:categoryid>/<int:itemid>', views.CartView.add_to_cart, name='add_to_cart'),
+    path('del_from_cart/<int:position>/', views.CartView.del_from_cart, name='del_from_cart'),
+    path('clear_the_cart/', views.CartView.clear_the_cart, name='clear_the_cart'),
+
     path('logout/', views.logout, name='logout'),
     #path('profile/', views.profile, name='profile'),
     path('profile/', views.profile.as_view(), name='profile'),
