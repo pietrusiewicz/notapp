@@ -10,7 +10,7 @@ from django.utils import timezone
 from .models import Category, Item, Order, Cart
 from .forms import LoginForm, ChangePasswordForm, CreateUserForm, AddItemForm
 
-#user = ''
+from collections import Counter
 
 def get_cart_context(username):
     user = User.objects.get(username=username)
@@ -31,7 +31,7 @@ def get_cart_context(username):
             'usname': user.username, 
             'orders': orders,
             'items': items,
-            'cart_items': cart_items
+            'cart_items': Counter(cart_items).items()
     }
     return context
 

@@ -1,5 +1,5 @@
-{% for item in cart_items %}
-    {{ item.item_name }} - {{ item.price }}
+{% for item, count_items in cart_items %}
+{{count_items}}x {{ item.item_name }} - {{ item.price }}
     <a href="/sklapp/del_from_cart/{{forloop.counter}}/">
 	<input type="button" value="-"/>
     </a>
