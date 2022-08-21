@@ -18,7 +18,7 @@ class Category(models.Model):
 class Item(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     #owner = models.OneToOneField(User, on_delete=models.CASCADE)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    owner = models.CharField(max_length=200)
     item_name = models.CharField(max_length=200)
     price = models.FloatField()
 
@@ -43,3 +43,4 @@ class Cart(models.Model):
     def get_item(self):
         c = Category.objects.get(pk=self.categoryid)
         return c.item_set.get(pk=self.itemid)
+

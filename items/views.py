@@ -72,11 +72,14 @@ class results(TemplateView):
 class CartView:
     "cart methods"
     def add_to_cart(r, categoryid, itemid):
-        user = User.objects.get(username=r.session['usname'])
-        c = Cart.objects.create(user=user, categoryid=categoryid, itemid=itemid, adding_date=timezone.now())
-        c.save()
+        if 'usname' in r.session:
+            user = User.objects.get(username=r.session['usname'])
+            c = Cart.objects.create(user=user, categoryid=categoryid, itemid=itemid, adding_date=timezone.now())
+            c.save()
 
-        return HttpResponseRedirect(f'/sklapp/{categoryid}')
+            return HttpResponseRedirect(f'/sklapp/{categoryid}')
+        else:
+            return HttpResponseRedirect('/sklapp/login/')
 
     def del_from_cart(r, position):
         if 'usname' in r.session:
