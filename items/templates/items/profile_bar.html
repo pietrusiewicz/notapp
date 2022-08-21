@@ -1,33 +1,27 @@
 <style>
 input {background: #066;}
 a {text-decoration: none;color:#660;}
-header {text-align:center;}
+.right > a {margin:10px;}
+.right {text-align:center;}
 </style>
 <header>
-<a href="/sklapp/">Shop</a>
-<p>
-<a href="/sklapp/profile/">{{usname}} </a>
-    <a href="/sklapp/change_password/">
+    <a style="float:left" href="/sklapp/">Shop</a>
+    <div class="right">
+	<a href="/sklapp/profile/">{{usname}} </a>
+        <a href="/sklapp/change_password/">
 	<input type="button" value="new password">
-    </a>
+        </a>
 
     <a href="/sklapp/add_item/">
 	<input type="button" value="add item">
     </a>
-<!--
-    <a href="/sklapp/checkout/">
-	<input type="button" value="order">
-    </a>
--->
     <input type="button" value="cart" id="cart" onclick="f()"/>
     <a href="/sklapp/logout/">
 	<input type="button" value="logout">
-	
     </a>
-    <div id="place_for_cart">
-    </div>
-    
-</p>
+	    <div id="place_for_cart">
+	    </div>
+	</div>
 </header>
 <script>
 function f(n=1) {

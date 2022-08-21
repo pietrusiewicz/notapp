@@ -38,14 +38,17 @@ def get_cart_context(username):
 class index(TemplateView):
     template_name = 'items/index.html'
 
+    """
+    def get(self, r, **kwargs):
+        return HttpResponseRedirect('/sklapp/login/')
+    """
+
     def get_context_data(self, **kwargs):
         if "usname" in self.request.session.keys():
             user = self.request.session["usname"]
             context = get_cart_context(user)
             context['latest_categories_list'] = Category.objects.all()
             return context
-        else:
-            return HttpResponseRedirect('/sklapp/login/')
 
 
 class items(TemplateView):
@@ -106,10 +109,12 @@ class CartView:
 class profile(TemplateView):
     template_name = 'items/profile.html'
 
-    def get_context_data(self, *args, **kwargs):
+    def get(self, r, **kwargs):
+        template_name = 'items/profile.html'
         user = self.request.session["usname"]
         if user:
-            return get_cart_context(user)
+            context = get_cart_context(user)
+            return render(r, template_name, context)
         else:
             return HttpResponseRedirect('/sklapp/login/')
 
@@ -136,6 +141,7 @@ class login(TemplateView):
     template_name = 'items/login.html'
 
     def post(self, r, *args, **kwargs):
+        template_name = 'items/login.html'
         form = LoginForm()
         self.context = {"forms":form}
         if 'usname' in r.POST and 'passwd' in r.POST:
@@ -153,14 +159,16 @@ class login(TemplateView):
             self.context["error_message"] = "Fill empty brackets"
         return render(r, template_name, context)
 
-    def get_context_data(self, *args, **kwargs):
-        if "usname" in self.request.session:
+
+    def get(self, r, *args, **kwargs):
+        template_name = 'items/login.html'
+        if "usname" in r.session:
             user = self.request.session["usname"]
             return HttpResponseRedirect('/sklapp/profile/')
         else:
             form = LoginForm()
             context = {"forms":form}
-            return context
+            return render(r, template_name, context)
 
 class register(TemplateView):
     template_name = 'items/register.html'
