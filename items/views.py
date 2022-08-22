@@ -47,7 +47,7 @@ class index(TemplateView):
         if "usname" in self.request.session.keys():
             user = self.request.session["usname"]
             context = get_cart_context(user)
-            context['latest_categories_list'] = Category.objects.all()
+            context['categories'] = Category.objects.all()
             return context
 
 
@@ -124,7 +124,7 @@ def add_item(r):
         if 'itemname' in r.POST and 'categoryid' in r.POST and 'price' in r.POST:
             category, itemname, price = r.POST['categoryid'], r.POST['itemname'], r.POST['price']
             c = Category.objects.get(id=category)
-            c.item_set.create(owner=user, item_name=itemname,price=price)
+            c.item_set.create(owner=user.username, items=itemname,price=price)
             c.save()
             current_site = r.path.split('/')[-1]
             return HttpResponseRedirect('/sklapp/profile/')
@@ -143,7 +143,7 @@ class login(TemplateView):
     def post(self, r, *args, **kwargs):
         template_name = 'items/login.html'
         form = LoginForm()
-        self.context = {"forms":form}
+        context = {"forms":form}
         if 'usname' in r.POST and 'passwd' in r.POST:
             usname, passwd = r.POST['usname'],r.POST['passwd']
             user = authenticate(username=usname, password=passwd)
@@ -154,9 +154,9 @@ class login(TemplateView):
 
             # wrong password
             else:
-                self.context["error_message"] = "Wrong password"
+                context["error_message"] = "Wrong password"
         else:
-            self.context["error_message"] = "Fill empty brackets"
+            context["error_message"] = "Fill empty brackets"
         return render(r, template_name, context)
 
 
@@ -240,12 +240,13 @@ def checkout(r):
     else:
         #u = User.objects.get(username=r.session['usname'])
         #for item in category.item_set.all():
-        for cart_item in cart_items:
-            c = Category.objects.get(id=cart_item.categoryid)
-            item = c.item_set.get(id=cart_item.itemid)
-            item.price += 0.01
-            item.save()
-            Order.objects.create(user=user, item_name=item, purchase_date=timezone.now())
+        #for cart_item in cart_items:
+            #c = Category.objects.get(id=cart_item.categoryid)
+            #item = c.item_set.get(id=cart_item.itemid)
+            #item.price += 0.01
+            #item.save()
+            #Order.objects.create(user=user, item_name=item, purchase_date=timezone.now())
+        Order.objects.create(user=user, items=str(dict(Counter(cart_items))), purchase_date=timezone.now())
 
         return HttpResponseRedirect(reverse('items:clear_the_cart'))
 

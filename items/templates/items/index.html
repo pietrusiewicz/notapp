@@ -1,7 +1,7 @@
 {% include 'items/profile_bar.html' %}
-{% if latest_categories_list %}
+{% if categories %}
     <ul>
-    {% for c in latest_categories_list %}
+    {% for c in categories %}
 	<li>
 	    <a href="{% url 'items:items' c.id %}">{{ c.category_name }}</a>
 	</li>

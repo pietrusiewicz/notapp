@@ -1,9 +1,9 @@
-import datetime
-
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from jsonfield import JSONField
 
+import datetime
 
 class Category(models.Model):
     category_name = models.CharField(max_length=200)
@@ -28,7 +28,8 @@ class Item(models.Model):
 class Order(models.Model):
     #user = models.OneToOneField(User, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    item_name = models.ForeignKey(Item, on_delete=models.CASCADE)
+    #item_name = models.ForeignKey(Item, on_delete=models.CASCADE)
+    items = JSONField()
     purchase_date = models.DateTimeField('purchase date')
 
     def __str__(self):
