@@ -17,3 +17,4 @@ class CreateUserForm(forms.Form):
 class AddItemForm(forms.Form):
     itemname = forms.CharField(label="item name")
     price = forms.FloatField(label="price")
+    count = forms.IntegerField(label="count")

@@ -21,6 +21,7 @@ class Item(models.Model):
     owner = models.CharField(max_length=200)
     item_name = models.CharField(max_length=200)
     price = models.FloatField()
+    count = models.IntegerField()
 
     def __str__(self):
         return self.item_name
@@ -28,8 +29,8 @@ class Item(models.Model):
 class Order(models.Model):
     #user = models.OneToOneField(User, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    #item_name = models.ForeignKey(Item, on_delete=models.CASCADE)
-    items = JSONField()
+    item_name = models.ForeignKey(Item, on_delete=models.CASCADE)
+    #items = JSONField()
     purchase_date = models.DateTimeField('purchase date')
 
     def __str__(self):

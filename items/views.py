@@ -55,14 +55,12 @@ class items(TemplateView):
     template_name = 'items/items.html'
 
     def get_context_data(self, *args, **kwargs):
-        if "usname" in self.request.session.keys():
-            user = self.request.session["usname"]
-            context = get_cart_context(user)
-            print(kwargs)
-            cid = kwargs['category_id']
-            context['category'] = get_object_or_404(Category, pk=cid)
-            print(context)
-            return context
+        user = self.request.session["usname"]
+        context = get_cart_context(user)
+        cid = kwargs['category_id']
+        context['category'] = get_object_or_404(Category, pk=cid)
+        print(context)
+        return context
 
 class results(TemplateView):
     template_name = 'items/results.html'
@@ -79,8 +77,8 @@ class CartView:
             user = User.objects.get(username=r.session['usname'])
             c = Cart.objects.create(user=user, categoryid=categoryid, itemid=itemid, adding_date=timezone.now())
             c.save()
-
-            return HttpResponseRedirect(f'/sklapp/{categoryid}')
+            print('sprawdz')
+            return HttpResponseRedirect(f'/sklapp/{categoryid}/')
         else:
             return HttpResponseRedirect('/sklapp/login/')
 
@@ -121,12 +119,12 @@ class profile(TemplateView):
 def add_item(r):
     if r.session['usname']:
         user = User.objects.get(username=r.session['usname'])
-        if 'itemname' in r.POST and 'categoryid' in r.POST and 'price' in r.POST:
-            category, itemname, price = r.POST['categoryid'], r.POST['itemname'], r.POST['price']
+        if 'itemname' in r.POST and 'categoryid' in r.POST and 'price' in r.POST and 'count' in r.POST:
+            category, itemname, price, count = r.POST['categoryid'], r.POST['itemname'], r.POST['price'], r.POST['count']
             c = Category.objects.get(id=category)
-            c.item_set.create(owner=user.username, items=itemname,price=price)
+            c.item_set.create(owner=user.username, item_name=itemname,price=price, count=count)
             c.save()
-            current_site = r.path.split('/')[-1]
+
             return HttpResponseRedirect('/sklapp/profile/')
         else:
             form = AddItemForm()
@@ -238,15 +236,15 @@ def checkout(r):
             'error_message': "You picked nothing",
         })
     else:
-        #u = User.objects.get(username=r.session['usname'])
+        u = User.objects.get(username=r.session['usname'])
         #for item in category.item_set.all():
-        #for cart_item in cart_items:
-            #c = Category.objects.get(id=cart_item.categoryid)
-            #item = c.item_set.get(id=cart_item.itemid)
-            #item.price += 0.01
-            #item.save()
-            #Order.objects.create(user=user, item_name=item, purchase_date=timezone.now())
-        Order.objects.create(user=user, items=str(dict(Counter(cart_items))), purchase_date=timezone.now())
+        for cart_item in cart_items:
+            c = Category.objects.get(id=cart_item.categoryid)
+            item = c.item_set.get(id=cart_item.itemid)
+            item.count -= 1
+            item.save()
+            Order.objects.create(user=user, item_name=item, purchase_date=timezone.now())
+        #Order.objects.create(user=user, items=str(dict(Counter(cart_items))), purchase_date=timezone.now())
 
         return HttpResponseRedirect(reverse('items:clear_the_cart'))
 
