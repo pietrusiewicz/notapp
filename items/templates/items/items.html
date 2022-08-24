@@ -7,8 +7,10 @@
 	    </legend>
 	    {% for item in category.item_set.all %}
 	    <p>{{ item.item_name }} ({{ item.price }})
-	    {% if item.count %}
+	    {% if item.count > 0 %}
 	    <a href="/sklapp/add_to_cart/{{category.id}}/{{item.id}}"><button>add to cart</button></a>
+	    <input type="button" value="display count of item" id="count" onclick="f1('{{item.count}}')"/>
+
 	    {% else %}
 	    <!--<a href="/sklapp/add_to_cart/{{category.id}}/{{item.id}}"><button>add to cart</button></a>-->
 	    <input type="button" value="add to cart" disabled/>
@@ -27,3 +29,10 @@
     </strong>
 </p>
 {% endif %}
+<script>
+function f1(n) {
+	//elem = document.getElementById('count');
+	//elem.setAttribute('value', "{{item.count}}");
+	alert("Magazine has "+n+" ones");
+}
+</script>
