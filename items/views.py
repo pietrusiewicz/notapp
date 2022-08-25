@@ -238,6 +238,8 @@ def checkout(r):
     else:
         u = User.objects.get(username=r.session['usname'])
         #for item in category.item_set.all():
+        """
+        number = Order.objects.get()
         for cart_item in cart_items:
             c = Category.objects.get(id=cart_item.categoryid)
             item = c.item_set.get(id=cart_item.itemid)
@@ -245,7 +247,16 @@ def checkout(r):
             item.save()
             number = Order.objects.count()
             Order.objects.create(user=user, item_name=item, purchase_date=timezone.now(), number=number)
-        #Order.objects.create(user=user, items=str(dict(Counter(cart_items))), purchase_date=timezone.now())
+        """
+        items = Counter()
+        for cart_item in cart_items:
+            c = Category.objects.get(id=cart_item.categoryid)
+            item = c.item_set.get(id=cart_item.itemid)
+            item.count -= 1
+            items[item.item_name] += 1
+        number = Order.objects.count()
+
+        Order.objects.create(user=user, items=str(dict(items)), purchase_date=timezone.now(), number=number)
 
         return HttpResponseRedirect(reverse('items:clear_the_cart'))
 

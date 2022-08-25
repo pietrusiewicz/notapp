@@ -29,12 +29,12 @@ class Item(models.Model):
 class Order(models.Model):
     number = models.IntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    item_name = models.ForeignKey(Item, on_delete=models.CASCADE)
-    #items = JSONField()
+    #item_name = models.ForeignKey(Item, on_delete=models.CASCADE)
+    items = JSONField()
     purchase_date = models.DateTimeField('purchase date')
 
     def __str__(self):
-        return f"{self.id} - {self.user}"
+        return f"{self.number} - {self.user}"
 
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
