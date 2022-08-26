@@ -254,9 +254,10 @@ def checkout(r):
             item = c.item_set.get(id=cart_item.itemid)
             item.count -= 1
             items[item.item_name] += 1
-        number = Order.objects.count()
+        #number = Order.objects.count()
 
-        Order.objects.create(user=user, items=str(dict(items)), purchase_date=timezone.now(), number=number)
+        #Order.objects.create(user=user, items=str(dict(items)), purchase_date=timezone.now(), number=number)
+        Order.objects.create(user=user, items=str(dict(items)), purchase_date=timezone.now())
 
         return HttpResponseRedirect(reverse('items:clear_the_cart'))
 

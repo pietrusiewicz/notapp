@@ -27,7 +27,7 @@ class Item(models.Model):
         return self.item_name
 
 class Order(models.Model):
-    number = models.IntegerField()
+    #number = models.IntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     #item_name = models.ForeignKey(Item, on_delete=models.CASCADE)
     items = JSONField()
