@@ -6,3 +6,4 @@
 <p>każdy user ma swoją nazwę i liczbę znaków</p>
 <b>oczekiwany remont aplikacji</b>
 <b>przemianowanie sklepu na notatnik</b>
+<b>aplikacja bedzie na dockera</b>
